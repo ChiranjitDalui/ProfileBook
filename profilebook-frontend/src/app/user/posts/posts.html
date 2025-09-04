@@ -1,0 +1,208 @@
+<div class="container mt-4">
+  <h2>Posts</h2>
+
+ <div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">Posts</h2>
+  <div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary" (click)="openProfileModal()">My Profile</button>
+    <button class="btn btn-danger" (click)="logout()">Logout</button>
+  </div>
+</div>
+
+
+  <!-- Search Users -->
+  <div class="card p-3 mb-4">
+    <div class="input-group">
+      <input [(ngModel)]="userSearch"
+             (keyup.enter)="searchUsers()"
+             class="form-control"
+             placeholder="Search users by name, username, email, or phone..." />
+      <button class="btn btn-outline-secondary" (click)="searchUsers()">Search</button>
+    </div>
+
+    <div *ngIf="isSearching" class="mt-2 small text-muted">Searching…</div>
+
+    <!-- Results -->
+    <div *ngIf="!isSearching && userResults.length" class="mt-3">
+      <div *ngFor="let u of userResults"
+           class="border rounded p-2 mb-2">
+
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="fw-semibold">{{ u.username || u.userName || u.name }}</div>
+            <div class="small text-muted">
+              {{ u.email || 'No email' }} · {{ u.fullName || 'No name' }}
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-primary" disabled>View Profile</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="toggleReport(u)">
+              {{ u._reportOpen ? 'Cancel' : 'Report' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Report User form -->
+        <div *ngIf="u._reportOpen" class="mt-2">
+          <div class="input-group">
+            <input [(ngModel)]="u._reason"
+                   class="form-control"
+                   placeholder="Reason (spam, abuse, fake profile, etc.)" />
+            <button class="btn btn-danger"
+                    [disabled]="reportingBusyId === (u.userId || u.UserId || u.id)"
+                    (click)="submitReport(u)">
+              Submit
+            </button>
+          </div>
+        </div>
+
+      </div> <!-- end *ngFor -->
+    </div> <!-- end results -->
+
+    <!-- Empty state -->
+    <div *ngIf="!isSearching && userResults && !userResults.length && userSearch"
+         class="mt-2 small text-muted">
+      No users found.
+    </div>
+  </div> <!-- end search card -->
+
+
+ 
+  <!-- Create Post -->
+  <div class="card p-3 mb-4">
+    <textarea [(ngModel)]="content"
+              class="form-control"
+              placeholder="What's on your mind?"></textarea>
+    <input type="file" (change)="onFileSelected($event)" class="form-control mt-2" />
+    <button (click)="createPost()" class="btn btn-primary mt-2">Post</button>
+  </div>
+
+  <!-- Post List -->
+  <div *ngFor="let post of posts" class="card mb-3">
+    <div class="card-body">
+      <p class="mb-2">{{ post.content }}</p>
+
+    <img *ngIf="post.postImage"
+     [src]="'http://localhost:5293/' + normalizePath(post.postImage)"
+     class="img-fluid mb-2" />
+
+
+      <div class="d-flex align-items-center gap-2">
+        <button (click)="likePost(post.id)" class="btn btn-sm btn-primary me-2">Like</button>
+        <span class="text-muted small me-3">👍 {{ post.likeCount }}</span>
+
+        <button class="btn btn-sm btn-outline-danger" (click)="toggleReportOnPost(post)">
+          {{ post._reportOpen ? 'Cancel Report' : 'Report User' }}
+        </button>
+      </div>
+
+      <!-- Report Post form -->
+      <div *ngIf="post._reportOpen" class="mt-2">
+        <div class="input-group">
+          <input [(ngModel)]="post._reason"
+                 class="form-control"
+                 placeholder="Reason (spam, abuse, fake, etc.)" />
+          <button class="btn btn-danger" (click)="submitReportForPost(post)">Submit</button>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="mt-3 border-top pt-3">
+        <h6 class="mb-2">Comments</h6>
+
+        <div *ngIf="post.comments?.length; else noComments">
+          <div *ngFor="let c of post.comments" class="mb-2">
+            <strong>{{ c.userName || 'User' }}</strong>:
+            <span>{{ c.text }}</span>
+          </div>
+        </div>
+        <ng-template #noComments>
+          <p class="text-muted mb-2">No comments yet.</p>
+        </ng-template>
+
+        <div class="input-group mt-2">
+          <input [(ngModel)]="post.newComment"
+                 placeholder="Add a comment"
+                 class="form-control" />
+          <button class="btn btn-outline-primary" (click)="commentPost(post)">
+            Comment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+<div class="modal-backdrop fade show" *ngIf="showProfileModal"
+     style="display:block; background: rgba(0,0,0,.35);"></div>
+
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="showProfileModal"
+     style="display:block;">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ profile ? 'Edit Profile' : 'Create Profile' }}</h5>
+        <button type="button" class="btn-close" aria-label="Close"
+                (click)="closeProfileModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Current avatar -->
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <img *ngIf="profile?.profileImage"
+               [src]="'http://localhost:5293/' + normalizePath(profile.profileImage)"
+               class="rounded" style="width:64px;height:64px;object-fit:cover" />
+          <div class="small text-muted" *ngIf="!profile?.profileImage">
+            No profile image yet.
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">Full name *</label>
+            <input [(ngModel)]="profileForm.fullName" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input [(ngModel)]="profileForm.email" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Phone</label>
+            <input [(ngModel)]="profileForm.phone" class="form-control" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Bio</label>
+            <textarea [(ngModel)]="profileForm.bio" rows="2" class="form-control"></textarea>
+          </div>
+        </div>
+
+        <!-- Image upload -->
+        <div class="mt-3">
+          <label class="form-label">Profile image</label>
+          <div class="input-group">
+            <input type="file" class="form-control" (change)="onProfileImageSelected($event)" />
+            <button class="btn btn-outline-primary"
+                    [disabled]="!profileImageFile || uploadingProfileImage"
+                    (click)="uploadProfilePic(true)">
+              {{ uploadingProfileImage ? 'Uploading…' : 'Upload Image' }}
+            </button>
+          </div>
+          <div class="form-text">You can save details first, then upload an image; or upload now.</div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeProfileModal()">Close</button>
+        <button class="btn btn-success"
+                [disabled]="savingProfile"
+                (click)="saveProfile()">
+          {{ savingProfile ? 'Saving…' : (profile ? 'Save Changes' : 'Create Profile') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Profile Modal -->
+</div>
