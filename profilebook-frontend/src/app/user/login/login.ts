@@ -25,7 +25,7 @@ export class LoginComponent {
         localStorage.setItem('role', res.role);
         this.message = 'Login successful!';
         if (res.role === 'Admin') {
-          this.router.navigate(['/admin/reports']);
+          this.router.navigate(['/admin/posts']);
         } else {
           this.router.navigate(['/posts']);
         }

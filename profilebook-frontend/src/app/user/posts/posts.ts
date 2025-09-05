@@ -89,7 +89,7 @@ private loadCommentsForPost(post: any) {
 
 
   likePost(id: number) {
-    const post = this.posts.find(p => p.id === id);
+    const post = this.posts.find(p => p.id === id); // find post in local array
     if (post) post.likeCount = (post.likeCount || 0) + 1;
 
     this.api.likePost(id).subscribe({

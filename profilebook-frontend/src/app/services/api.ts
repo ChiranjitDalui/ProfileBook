@@ -96,5 +96,57 @@ getAllReports() {
 
 
 
+// ADMIN: list all then filter pending (matches your existing /all)
+getPendingPosts() {
+  return this.http.get<any[]>(
+    `${this.apiUrl}/posts/all`,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+approvePost(id: number) {
+  return this.http.put(
+    `${this.apiUrl}/posts/approve/${id}`, // PUT + path matches controller
+    {},
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+rejectPost(id: number) {
+  return this.http.put(
+    `${this.apiUrl}/posts/reject/${id}`,   // PUT + path matches controller
+    {},
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+
+// Now starting user management methods
+
+// --- ADMIN: Users ---
+getUsers() {
+  return this.http.get<any[]>(
+    `${this.apiUrl}/users`,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+updateUser(id: number, payload: { username: string; role: string; newPassword?: string }) {
+  return this.http.put(
+    `${this.apiUrl}/users/${id}`,
+    payload,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+
+deleteUser(id: number) {
+  return this.http.delete(
+    `${this.apiUrl}/users/${id}`,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+
 
 }

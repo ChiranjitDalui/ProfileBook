@@ -1,0 +1,61 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Admin • Approve Posts</h3>
+    <div class="d-flex gap-2">
+      
+      <a class="btn btn-outline-secondary" href="/admin/reports">Reports</a>
+      <a class="btn btn-outline-secondary" href="/posts">User Posts</a>
+      <a class="btn btn-outline-secondary" href="/admin/users">Manage Users</a>
+      <button class="btn btn-outline-primary" (click)="fetch()" [disabled]="loading">
+        {{ loading ? 'Refreshing…' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card p-3 mb-3">
+    <div class="row g-2">
+      <div class="col-md-6">
+        <input [(ngModel)]="q" (input)="apply()"
+               class="form-control"
+               placeholder="Search content, username, or userId…" />
+      </div>
+      <div class="col-md-6 text-end">
+        <button class="btn btn-sm btn-link" (click)="clear()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="card">
+    <div *ngIf="!loading && !filtered.length" class="text-center text-muted py-4">
+      No pending posts.
+    </div>
+
+    <div class="list-group list-group-flush">
+      <div *ngFor="let p of filtered" class="list-group-item">
+        <div class="d-flex gap-3">
+          <img *ngIf="p.postImage"
+               [src]="'http://localhost:5293/' + normalizePath(p.postImage)"
+               class="rounded"
+               style="width:90px;height:90px;object-fit:cover" />
+
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between">
+              <div>
+                <div class="fw-semibold">{{ p.username || p.user?.username || ('User #' + (p.userId || '')) }}</div>
+                <div class="small text-muted">Post #{{ p.id }} · Likes: {{ p.likeCount || 0 }}</div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-success" (click)="approve(p)">Approve</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="reject(p)">Reject</button>
+              </div>
+            </div>
+
+            <div class="mt-2">{{ p.content }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

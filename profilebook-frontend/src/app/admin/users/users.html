@@ -1,0 +1,117 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Admin • Manage Users</h3>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="/admin/posts">Approve Posts</a>
+      <a class="btn btn-outline-secondary" href="/admin/reports">Reports</a>
+      <a class="btn btn-outline-secondary" href="/posts">Back to Posts</a>
+      <button class="btn btn-outline-primary" (click)="fetch()" [disabled]="loading">
+        {{ loading ? 'Refreshing…' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card p-3 mb-3">
+    <div class="row g-2">
+      <div class="col-md-6">
+        <input [(ngModel)]="q" (input)="apply()" class="form-control"
+               placeholder="Search by username or userId…" />
+      </div>
+      <div class="col-md-4">
+        <select [(ngModel)]="role" (change)="apply()" class="form-select">
+          <option value="">All roles</option>
+          <option value="User">User</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div class="col-md-2 text-end">
+        <button class="btn btn-sm btn-link" (click)="clearFilters()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-sm table-striped align-middle mb-0">
+        <thead>
+          <tr>
+            <th style="width:90px;">ID</th>
+            <th>Username</th>
+            <th style="width:160px;">Role</th>
+            <th style="width:220px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filtered">
+            <td>{{ u.id }}</td>
+            <td>{{ u.username }}</td>
+            <td>
+              <span class="badge text-bg-secondary" *ngIf="u.role === 'User'">User</span>
+              <span class="badge text-bg-primary" *ngIf="u.role === 'Admin'">Admin</span>
+            </td>
+           <td>
+         <button *ngIf="u.id !== currentUserId"
+          class="btn btn-sm btn-outline-primary me-2"
+          (click)="openEdit(u)">Edit</button>
+         <button *ngIf="u.id !== currentUserId"
+          class="btn btn-sm btn-outline-danger"
+          (click)="remove(u)">Delete</button>
+         </td>
+
+          </tr>
+          <tr *ngIf="!loading && !filtered.length">
+            <td colspan="4" class="text-center text-muted py-4">No users found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-backdrop fade show" *ngIf="showEdit"
+     style="display:block; background: rgba(0,0,0,.35);"></div>
+
+<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="showEdit"
+     style="display:block;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit User</h5>
+        <button type="button" class="btn-close" aria-label="Close"
+                (click)="closeEdit()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">Username</label>
+          <input [(ngModel)]="editForm.username" class="form-control" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Role</label>
+          <select [(ngModel)]="editForm.role" class="form-select">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">New Password (optional)</label>
+          <input [(ngModel)]="editForm.newPassword" type="password" class="form-control"
+                 placeholder="Leave blank to keep current password" />
+          <div class="form-text">
+            If set, backend will hash it (it expects the raw password in <code>PasswordHash</code>).
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeEdit()">Cancel</button>
+        <button class="btn btn-success" [disabled]="saving" (click)="saveEdit()">
+          {{ saving ? 'Saving…' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

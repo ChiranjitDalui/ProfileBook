@@ -3,6 +3,8 @@ import { LoginComponent } from './user/login/login';
 import { RegisterComponent } from './user/register/register';
 import { PostsComponent } from './user/posts/posts';
 import { AdminReportsComponent } from './admin/reports/reports/reports';
+import { AdminPostsApproveComponent } from './admin/posts-approve/posts-approve';
+import { AdminUsersComponent } from './admin/users/users';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -10,7 +12,12 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'posts', component: PostsComponent },
   { path: 'admin/reports', component: AdminReportsComponent },
-  
+  { path: 'admin/posts', component: AdminPostsApproveComponent },
+  { path: 'admin/users', component: AdminUsersComponent },// here what i do? Answer: add a redirect from /admin to /admin/posts
+
+
+  { path: 'admin', redirectTo: 'admin/posts', pathMatch: 'full' }, // send /admin to moderation first
+
   // redirect plain /admin to reports
   { path: 'admin', redirectTo: 'admin/reports', pathMatch: 'full' },
 

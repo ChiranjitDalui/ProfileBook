@@ -85,7 +85,7 @@ namespace ProfileBookAPI.Controllers
 
             post.Status = "Approved";
             _context.SaveChanges();
-            return Ok("Post approved.");
+          return Ok(new { message = "Post approved." });
         }
 
         // REJECT Post (Admin)
@@ -98,7 +98,7 @@ namespace ProfileBookAPI.Controllers
 
             post.Status = "Rejected";
             _context.SaveChanges();
-            return Ok("Post rejected.");
+           return Ok(new { message = "Post rejected." });
         }
 
         // LIKE Post (User)
