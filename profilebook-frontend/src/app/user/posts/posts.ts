@@ -2,16 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api';
-
+import { NotificationsComponent } from "../../shared/notifications/notifications";
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, NotificationsComponent],
   templateUrl: './posts.html',
   styleUrls: ['./posts.css']
 })
 export class PostsComponent implements OnInit {
   posts: any[] = [];
+selectedUserId: any;
+isAdmin: any;
+currentUser: any;
 
   normalizePath(path: string | null | undefined): string {
   if (!path) return '';
@@ -56,20 +59,51 @@ uploadingProfileImage = false;
     window.location.href = '/login';
   }
 
-  // -------- Posts + Comments --------
- loadPosts() {
+// -------- Posts + Comments --------
+loadPosts() {
   this.api.getApprovedPosts().subscribe(
     (res: any[]) => {
       this.posts = (res || []).map(p => ({
         ...p,
+
+        // normalize common id/content fields (optional)
+        id: p.id ?? p.Id,
+        content: p.content ?? p.Content,
+
+        // normalize image path
+        postImage: this.normalizePath(p.postImage ?? p.PostImage ?? p.post_image ?? null),
+
+        // normalize author fields. Try many possible names returned by API
+        userId: p.userId ?? p.user?.id ?? p.user?.Id ?? p.UserId ?? p.User?.Id ?? null,
+        userName:
+          p.userName
+          ?? p.author
+          ?? p.Author
+          ?? p.user?.username
+          ?? p.user?.userName
+          ?? p.user?.fullName
+          ?? p.user?.full_name
+          ?? p.User?.Username
+          ?? p.User?.FullName
+          ?? 'A User',
+
+        // normalize createdAt (for date pipe)
+        createdAt: p.createdAt ?? p.CreatedAt ?? p.created_at ?? new Date().toISOString(),
+
+        // leave UI state fields
         newComment: '',
         comments: [],
+
+        // normalize likes (support different shapes)
         likeCount:
-          (typeof p.likes === 'number')
-            ? p.likes
-            : Array.isArray(p.likes) ? p.likes.length
-            : (p.likeCount ?? 0)
+          (typeof (p.likes ?? p.Likes) === 'number')
+            ? (p.likes ?? p.Likes)
+            : Array.isArray(p.likes ?? p.Likes)
+              ? (p.likes ?? p.Likes).length
+              : (p.likeCount ?? p.likeCount ?? p.LikeCount ?? 0)
       }));
+
+      // load comments for each post (existing behavior)
       this.posts.forEach(p => this.loadCommentsForPost(p));
     },
     (err) => {
@@ -77,6 +111,7 @@ uploadingProfileImage = false;
     }
   );
 }
+
 
 private loadCommentsForPost(post: any) {
   this.api.getComments(post.id).subscribe(
@@ -322,4 +357,5 @@ uploadProfilePic(stayOpen = false) {
     }
   );
 }
+
 }

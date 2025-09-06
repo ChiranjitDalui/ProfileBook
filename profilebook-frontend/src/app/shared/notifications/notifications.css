@@ -1,0 +1,57 @@
+/* Scopes all styles to the notification component's root element */
+.notif-root { 
+  position: relative; 
+  display: inline-block; 
+}
+
+/* Styles for the bell icon button */
+.notif-bell.btn-link {
+  text-decoration: none;
+  color: #6c757d; /* Standard secondary text color */
+}
+.notif-bell.btn-link:hover {
+  color: #212529; /* Darker on hover */
+}
+.notif-bell:focus {
+  box-shadow: none; /* Removes default focus outline */
+}
+
+/* Adjusts the font size of the notification badge */
+.notif-bell .badge {
+  font-size: 0.6em;
+  padding: .3em .5em;
+}
+
+/* Main dropdown panel */
+.notif-dropdown {
+  position: absolute;
+  width: 350px; /* Wider for better readability */
+  max-width: calc(100vw - 30px);
+  z-index: 3000;
+  margin-top: 10px;
+  left: 0; 
+  right: auto;
+  font-size: 0.9rem;
+}
+
+/* Creates a scrollable list for notifications */
+.notif-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notif-list .list-group-item {
+  white-space: normal;
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
+}
+.notif-list .list-group-item:first-child {
+  border-top: 0;
+}
+
+/* Highlights the unread message text */
+.notif-message.unread {
+  font-weight: 600;
+  color: #000;
+}

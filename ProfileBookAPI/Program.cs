@@ -1,14 +1,22 @@
+// ProfileBookAPI/Program.cs
 using Microsoft.EntityFrameworkCore;
 using ProfileBookAPI.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using ProfileBookAPI.Hubs;
+using ProfileBookAPI.Services;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddControllers();
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(x =>
@@ -16,12 +24,11 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with JWT support
+// Swagger with JWT
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProfileBook API", Version = "v1" });
 
-    // Add JWT authentication option in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -36,11 +43,7 @@ builder.Services.AddSwaggerGen(c =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             new string[] {}
         }
@@ -51,7 +54,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// JWT Authentication
+// JWT Authentication (unchanged)
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -62,22 +65,44 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("ThisIsASuperStrongSecretKeyForJWT123456789!") // must be 32+ chars
+                Encoding.UTF8.GetBytes("ThisIsASuperStrongSecretKeyForJWT123456789!")
             )
+        };
+
+        // Important: allow token from querystring for SignalR hub
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
-// ✅ Add CORS service
+// Add CORS - allow credentials for SignalR
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular",
         policy =>
         {
-            policy.WithOrigins("http://localhost:4200") // Angular app URL
+            policy.WithOrigins("http://localhost:4200") // update if different
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // important for SignalR
         });
 });
+
+// Add SignalR
+builder.Services.AddSignalR();
+
+// Register IUserIdProvider to map NameIdentifier -> Context.UserIdentifier
+builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
 var app = builder.Build();
 
 // Middlewares
@@ -92,10 +117,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors("AllowAngular");
 
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
+// Map SignalR hub
+app.MapHub<ChatHub>("/ChatHub");
 app.Run();

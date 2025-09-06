@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Groups</title>
+
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="groups.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ===================== -->
+    <!--   GLOBAL HEADER       -->
+    <!-- ===================== -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container-fluid">
+                <!-- Hamburger Menu Button (Visible on small screens) -->
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Brand/Logo -->
+                <a class="navbar-brand fw-bolder text-primary mx-lg-0 mx-auto" href="#">
+                    <i class="bi bi-person-badge-fill me-2 fs-4"></i>
+                    ProfileBook
+                </a>
+
+                <!-- Right Aligned Icons -->
+                <div class="d-flex align-items-center">
+                   <button class="btn btn-danger" (click)="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ===================== -->
+    <!--   MAIN ADMIN PAGE     -->
+    <!-- ===================== -->
+    <div class="admin-container">
+
+        <!-- ADMIN SIDEBAR (NOW AN OFFCANVAS COMPONENT) -->
+        <aside id="adminSidebar" class="admin-sidebar offcanvas-lg offcanvas-start" tabindex="-1">
+            
+            <div class="offcanvas-header d-lg-none">
+                <h5 class="offcanvas-title">Admin Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Close"></button>
+            </div>
+            
+            <div class="admin-sidebar-body">
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/admin/posts"><i class="bi bi-patch-check"></i> Approve Posts</a>
+                    <a class="nav-link" href="/admin/reports"><i class="bi bi-exclamation-octagon"></i> View Reports</a>
+                    <a class="nav-link" href="/admin/users"><i class="bi bi-people"></i> Manage Users</a>
+                    <a class="nav-link active" href="/admin/groups"><i class="bi bi-collection-fill"></i> Manage Groups</a>
+                    <hr>
+                    <a class="nav-link" href="/posts"><i class="bi bi-arrow-left-circle"></i> Back to User Feed</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-content">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="m-0 fw-bold">Manage Groups</h3>
+                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="fetch()" [disabled]="loading">
+                    <i class="bi bi-arrow-clockwise"></i> {{ loading ? 'Refreshing…' : 'Refresh' }}
+                </button>
+            </div>
+
+            <div class="card p-3 mb-4">
+                 <div class="row g-2 align-items-center">
+                    <div class="col-lg-8">
+                        <input [(ngModel)]="newGroupName" class="form-control" placeholder="New group name (e.g., Developers, Marketing...)" />
+                    </div>
+                    <div class="col-lg-4 d-grid">
+                        <button class="btn btn-success d-flex align-items-center justify-content-center gap-2" (click)="createGroup()" [disabled]="creating || !newGroupName?.trim()">
+                            <i class="bi bi-plus-lg"></i>
+                            {{ creating ? 'Creating…' : 'Create Group' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:80px;">ID</th>
+                                <th>Group Name</th>
+                                <th>Members</th>
+                                <th style="width:400px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let g of groups">
+                                <td><span class="badge bg-secondary">#{{ g.id }}</span></td>
+                                <td class="fw-bold">{{ g.groupName }}</td>
+                                <td>
+                                    <div *ngIf="g.members?.length; else noMembers" class="d-flex flex-wrap gap-2">
+                                        <span class="chip" *ngFor="let m of g.members">
+                                            {{ m.username }}
+                                            <button type="button" class="chip-x btn btn-sm btn-link text-danger p-0 ms-1" [disabled]="removingBusy[g.id + ':' + m.userId]" (click)="removeMember(g.id, m.userId)">
+                                                <span *ngIf="!removingBusy[g.id + ':' + m.userId]">×</span>
+                                                <span *ngIf="removingBusy[g.id + ':' + m.userId]" class="spinner-border spinner-border-sm"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <ng-template #noMembers><span class="text-muted small">No members</span></ng-template>
+                                </td>
+                                <td>
+                                    <div *ngIf="addingForGroupId !== g.id; else addRow" class="d-flex gap-2 align-items-center">
+                                        <button class="btn btn-sm btn-outline-primary" (click)="startAddMember(g.id)">Add Member</button>
+                                        <div class="input-group input-group-sm ms-2" style="max-width:220px;">
+                                            <input type="number" class="form-control" placeholder="User ID" [(ngModel)]="addUserId" min="1" />
+                                            <button class="btn btn-success" (click)="confirmAddMember(g.id)" [disabled]="addingBusy">Add</button>
+                                        </div>
+                                    </div>
+                                    <ng-template #addRow>
+                                        <div class="d-flex align-items-start gap-2">
+                                            <div class="position-relative flex-grow-1">
+                                                <input type="text" class="form-control form-control-sm" placeholder="Search by username or email" [(ngModel)]="memberSearch" (input)="onMemberSearch()" />
+                                                <ul *ngIf="memberResults?.length" class="list-group position-absolute w-100 mt-1 shadow-sm" style="z-index:1000;">
+                                                    <li *ngFor="let u of memberResults" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-2">
+                                                        <div>
+                                                            <strong>{{ u.username }}</strong>
+                                                            <div class="small text-muted">{{ u.email }}</div>
+                                                        </div>
+                                                        <button class="btn btn-sm btn-success" (click)="confirmAddMember(g.id, u.id)">Add</button>
+                                                    </li>
+                                                </ul>
+                                                <div *ngIf="memberSearch && !memberResults?.length && !searching" class="mt-1 small text-muted">No users found.</div>
+                                                <div *ngIf="searching" class="mt-1 small text-muted">Searching…</div>
+                                            </div>
+                                            <button class="btn btn-outline-secondary btn-sm" (click)="cancelAddMember()">Cancel</button>
+                                        </div>
+                                    </ng-template>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!loading && !groups.length">
+                                <td colspan="4" class="text-center text-muted p-5">
+                                    <i class="bi bi-collection fs-1"></i>
+                                    <h5 class="mt-2">No Groups Yet</h5>
+                                    <p>Create your first group using the form above.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- This script makes the hamburger menu work -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

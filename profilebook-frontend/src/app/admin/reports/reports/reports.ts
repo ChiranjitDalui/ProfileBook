@@ -86,4 +86,11 @@ export class AdminReportsComponent implements OnInit {
     this.q = this.user = this.reported = '';
     this.filtered = this.reports.slice();
   }
+
+
+
+    logout() {
+    localStorage.clear();
+    window.location.href = '/login';
+  }
 }

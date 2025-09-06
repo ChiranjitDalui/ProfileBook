@@ -5,6 +5,9 @@ import { PostsComponent } from './user/posts/posts';
 import { AdminReportsComponent } from './admin/reports/reports/reports';
 import { AdminPostsApproveComponent } from './admin/posts-approve/posts-approve';
 import { AdminUsersComponent } from './admin/users/users';
+import { AdminGroupsComponent } from './admin/groups/groups';
+
+
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -14,6 +17,7 @@ export const routes: Routes = [
   { path: 'admin/reports', component: AdminReportsComponent },
   { path: 'admin/posts', component: AdminPostsApproveComponent },
   { path: 'admin/users', component: AdminUsersComponent },// here what i do? Answer: add a redirect from /admin to /admin/posts
+  { path: 'admin/groups', component: AdminGroupsComponent },
 
 
   { path: 'admin', redirectTo: 'admin/posts', pathMatch: 'full' }, // send /admin to moderation first

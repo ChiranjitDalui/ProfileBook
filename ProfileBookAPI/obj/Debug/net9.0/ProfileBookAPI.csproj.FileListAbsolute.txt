@@ -335,3 +335,5 @@ D:\ProfileBook\ProfileBookAPI\obj\Debug\net9.0\ProfileBookAPI.pdb
 D:\ProfileBook\ProfileBookAPI\obj\Debug\net9.0\ProfileBookAPI.genruntimeconfig.cache
 D:\ProfileBook\ProfileBookAPI\obj\Debug\net9.0\ref\ProfileBookAPI.dll
 D:\ProfileBook\ProfileBookAPI\obj\Debug\net9.0\ProfileBookAPI.sourcelink.json
+D:\ProfileBook\ProfileBookAPI\bin\Debug\net9.0\Newtonsoft.Json.dll
+D:\ProfileBook\ProfileBookAPI\bin\Debug\net9.0\System.Net.WebSockets.WebSocketProtocol.dll

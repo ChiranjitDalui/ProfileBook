@@ -71,6 +71,8 @@ namespace ProfileBookAPI.Controllers
         {
             var posts = _context.Posts
                 .Where(p => p.Status == "Approved")
+                .Include(p => p.User) // Include user info
+                .OrderByDescending(p => p.Id)
                 .ToList();
             return Ok(posts);
         }
@@ -84,8 +86,16 @@ namespace ProfileBookAPI.Controllers
             if (post == null) return NotFound();
 
             post.Status = "Approved";
+
+            // Create notification for user
+            _context.Notifications.Add(new Notification
+            {
+                UserId = post.UserId,
+                Message = $"Your post '{post.Content}' has been approved!"
+            });
+
             _context.SaveChanges();
-          return Ok(new { message = "Post approved." });
+            return Ok(new { message = "Post approved." });
         }
 
         // REJECT Post (Admin)
@@ -97,8 +107,16 @@ namespace ProfileBookAPI.Controllers
             if (post == null) return NotFound();
 
             post.Status = "Rejected";
+
+            // Create notification
+            _context.Notifications.Add(new Notification
+            {
+                UserId = post.UserId,
+                Message = $"Your post '{post.Content}' has been rejected."
+            });
+
             _context.SaveChanges();
-           return Ok(new { message = "Post rejected." });
+            return Ok(new { message = "Post rejected." });
         }
 
         // LIKE Post (User)
@@ -158,6 +176,7 @@ namespace ProfileBookAPI.Controllers
         [AllowAnonymous]
         public IActionResult SearchPosts([FromQuery] string query)
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var results = _context.Posts
                 .Where(p => p.Status == "Approved" &&
                            (p.Content.Contains(query) || p.User.Username.Contains(query)))
@@ -171,6 +190,7 @@ namespace ProfileBookAPI.Controllers
                     p.Likes
                 })
                 .ToList();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             return Ok(results);
         }

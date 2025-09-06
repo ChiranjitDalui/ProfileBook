@@ -130,4 +130,9 @@ this.api.updateUser(this.editForm.id, payload).subscribe({
       }
     });
   }
+
+    logout() {
+    localStorage.clear();
+    window.location.href = '/login';
+  }
 }

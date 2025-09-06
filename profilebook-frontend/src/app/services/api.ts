@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -146,6 +147,57 @@ deleteUser(id: number) {
     { headers: this.getAuthHeaders() }
   );
 }
+
+
+
+// --- Groups ---
+getGroups(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/groups`, { headers: this.getAuthHeaders() });
+}
+
+createGroup(name: string): Observable<any> {
+  return this.http.post(
+    `${this.apiUrl}/groups`,
+    { groupName: name },  // send JSON object matching CreateGroupDto
+    {
+      headers: this.getAuthHeaders().set('Content-Type', 'application/json')
+    }
+  );
+}
+
+
+addUserToGroup(groupId: number, userId: number): Observable<any> {
+  return this.http.post(
+    `${this.apiUrl}/groups/${groupId}/add/${userId}`,
+    {},
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+removeUserFromGroup(groupId: number, userId: number): Observable<any> {
+  return this.http.delete(
+    `${this.apiUrl}/groups/${groupId}/remove/${userId}`,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+
+// --- Notifications ---
+getNotifications() {
+  return this.http.get<any[]>(
+    `${this.apiUrl}/notifications/me`,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+markNotificationRead(id: number) {
+  return this.http.put(
+    `${this.apiUrl}/notifications/${id}/read`,
+    {},
+    { headers: this.getAuthHeaders() }
+  );
+}
+
 
 
 

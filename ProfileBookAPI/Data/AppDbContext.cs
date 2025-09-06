@@ -19,6 +19,9 @@ namespace ProfileBookAPI.Data
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

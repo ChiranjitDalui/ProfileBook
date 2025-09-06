@@ -1,117 +1,185 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">Admin • Manage Users</h3>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-secondary" href="/admin/posts">Approve Posts</a>
-      <a class="btn btn-outline-secondary" href="/admin/reports">Reports</a>
-      <a class="btn btn-outline-secondary" href="/posts">Back to Posts</a>
-      <button class="btn btn-outline-primary" (click)="fetch()" [disabled]="loading">
-        {{ loading ? 'Refreshing…' : 'Refresh' }}
-      </button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Users (Responsive)</title>
+
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="users.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ===================== -->
+    <!--   GLOBAL HEADER       -->
+    <!-- ===================== -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container-fluid">
+                <!-- Hamburger Menu Button (Visible on small screens) -->
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Brand/Logo -->
+                <a class="navbar-brand fw-bolder text-primary mx-lg-0 mx-auto" href="#">
+                    <i class="bi bi-person-badge-fill me-2 fs-4"></i>
+                    ProfileBook
+                </a>
+
+                <!-- Right Aligned Icons -->
+                <div class="d-flex align-items-center">
+                   <button class="btn btn-danger" (click)="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ===================== -->
+    <!--   MAIN ADMIN PAGE     -->
+    <!-- ===================== -->
+    <div class="admin-container">
+
+        <!-- ADMIN SIDEBAR (NOW AN OFFCANVAS COMPONENT) -->
+        <aside id="adminSidebar" class="admin-sidebar offcanvas-lg offcanvas-start" tabindex="-1">
+            
+            <div class="offcanvas-header d-lg-none">
+                <h5 class="offcanvas-title">Admin Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Close"></button>
+            </div>
+            
+            <div class="admin-sidebar-body">
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/admin/posts"><i class="bi bi-patch-check"></i> Approve Posts</a>
+                    <a class="nav-link" href="/admin/reports"><i class="bi bi-exclamation-octagon"></i> View Reports</a>
+                    <a class="nav-link active" href="/admin/users"><i class="bi bi-people-fill"></i> Manage Users</a>
+                    <a class="nav-link" href="/admin/groups"><i class="bi bi-collection"></i> Manage Groups</a>
+                    <hr>
+                    <a class="nav-link" href="/posts"><i class="bi bi-arrow-left-circle"></i> Back to User Feed</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-content">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="m-0 fw-bold">Manage Users</h3>
+                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="fetch()" [disabled]="loading">
+                    <i class="bi bi-arrow-clockwise"></i> {{ loading ? 'Refreshing…' : 'Refresh' }}
+                </button>
+            </div>
+
+            <div class="card p-3 mb-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md">
+                        <input [(ngModel)]="q" (input)="apply()" class="form-control" placeholder="Search by username or user ID…" />
+                    </div>
+                    <div class="col-md-4">
+                        <select [(ngModel)]="role" (change)="apply()" class="form-select">
+                            <option value="">All Roles</option>
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-auto">
+                        <button class="btn btn-link text-decoration-none" (click)="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th style="width:160px;">Role</th>
+                                <th style="width:180px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let u of filtered">
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="user-avatar">{{ u.username?.charAt(0).toUpperCase() || 'U' }}</div>
+                                        <div>
+                                            <div class="fw-bold">{{ u.username }}</div>
+                                            <div class="text-muted small">User ID: #{{ u.id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill text-bg-secondary" *ngIf="u.role === 'User'">User</span>
+                                    <span class="badge rounded-pill text-bg-primary" *ngIf="u.role === 'Admin'">Admin</span>
+                                </td>
+                                <td>
+                                    <button *ngIf="u.id !== currentUserId" class="btn btn-sm btn-outline-primary me-2" (click)="openEdit(u)">Edit</button>
+                                    <button *ngIf="u.id !== currentUserId" class="btn btn-sm btn-outline-danger" (click)="remove(u)">Delete</button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!loading && !filtered.length">
+                                <td colspan="3" class="text-center text-muted p-5">
+                                    <i class="bi bi-person-x fs-1"></i>
+                                    <h5 class="mt-2">No Users Found</h5>
+                                    <p>No users match your current filters.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
 
-  <!-- Filters -->
-  <div class="card p-3 mb-3">
-    <div class="row g-2">
-      <div class="col-md-6">
-        <input [(ngModel)]="q" (input)="apply()" class="form-control"
-               placeholder="Search by username or userId…" />
-      </div>
-      <div class="col-md-4">
-        <select [(ngModel)]="role" (change)="apply()" class="form-select">
-          <option value="">All roles</option>
-          <option value="User">User</option>
-          <option value="Admin">Admin</option>
-        </select>
-      </div>
-      <div class="col-md-2 text-end">
-        <button class="btn btn-sm btn-link" (click)="clearFilters()">Clear</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Table -->
-  <div class="card">
-    <div class="table-responsive">
-      <table class="table table-sm table-striped align-middle mb-0">
-        <thead>
-          <tr>
-            <th style="width:90px;">ID</th>
-            <th>Username</th>
-            <th style="width:160px;">Role</th>
-            <th style="width:220px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let u of filtered">
-            <td>{{ u.id }}</td>
-            <td>{{ u.username }}</td>
-            <td>
-              <span class="badge text-bg-secondary" *ngIf="u.role === 'User'">User</span>
-              <span class="badge text-bg-primary" *ngIf="u.role === 'Admin'">Admin</span>
-            </td>
-           <td>
-         <button *ngIf="u.id !== currentUserId"
-          class="btn btn-sm btn-outline-primary me-2"
-          (click)="openEdit(u)">Edit</button>
-         <button *ngIf="u.id !== currentUserId"
-          class="btn btn-sm btn-outline-danger"
-          (click)="remove(u)">Delete</button>
-         </td>
-
-          </tr>
-          <tr *ngIf="!loading && !filtered.length">
-            <td colspan="4" class="text-center text-muted py-4">No users found.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal-backdrop fade show" *ngIf="showEdit"
-     style="display:block; background: rgba(0,0,0,.35);"></div>
-
-<div class="modal fade show" tabindex="-1" role="dialog" *ngIf="showEdit"
-     style="display:block;">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit User</h5>
-        <button type="button" class="btn-close" aria-label="Close"
-                (click)="closeEdit()"></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Username</label>
-          <input [(ngModel)]="editForm.username" class="form-control" />
+    <!-- Edit Modal -->
+    <div class="modal-backdrop fade show" *ngIf="showEdit" style="display:block;"></div>
+    <div class="modal fade show" tabindex="-1" *ngIf="showEdit" style="display:block;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User: {{ editForm.username }}</h5>
+                    <button type="button" class="btn-close" (click)="closeEdit()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input [(ngModel)]="editForm.username" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select [(ngModel)]="editForm.role" class="form-select">
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password (Optional)</label>
+                        <input [(ngModel)]="editForm.newPassword" type="password" class="form-control" placeholder="Leave blank to keep current" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" (click)="closeEdit()">Cancel</button>
+                    <button class="btn btn-success" [disabled]="saving" (click)="saveEdit()">
+                        {{ saving ? 'Saving…' : 'Save Changes' }}
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="mb-2">
-          <label class="form-label">Role</label>
-          <select [(ngModel)]="editForm.role" class="form-select">
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">New Password (optional)</label>
-          <input [(ngModel)]="editForm.newPassword" type="password" class="form-control"
-                 placeholder="Leave blank to keep current password" />
-          <div class="form-text">
-            If set, backend will hash it (it expects the raw password in <code>PasswordHash</code>).
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeEdit()">Cancel</button>
-        <button class="btn btn-success" [disabled]="saving" (click)="saveEdit()">
-          {{ saving ? 'Saving…' : 'Save Changes' }}
-        </button>
-      </div>
     </div>
-  </div>
-</div>
+
+    <!-- This script makes the hamburger menu work -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

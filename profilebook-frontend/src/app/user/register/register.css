@@ -1,0 +1,66 @@
+    
+        /* This CSS is identical to the login page for consistency */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem 0; /* Add some padding for smaller screens */
+        }
+
+        /* The main card container for your form */
+        .register-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styling for the header section */
+        .register-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-header h1 {
+            font-weight: 800;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        /* Making the labels a bit more subtle */
+        .form-group label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Customizing form inputs */
+        .form-control, .form-select {
+            padding: 0.85rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ced4da;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Styling the register button */
+        .btn-success {
+            padding: 0.85rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            width: 100%; 
+        }
+

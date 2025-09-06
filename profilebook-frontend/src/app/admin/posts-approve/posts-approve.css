@@ -1,0 +1,92 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+    padding-top: 70px; 
+}
+
+/* --- Header Styles --- */
+.navbar {
+    height: 65px;
+}
+
+/* --- Main Admin Layout --- */
+
+/* Default styles (mobile-first) */
+.admin-container {
+    max-width: 1600px;
+    margin: 1.5rem auto 0;
+    padding: 0 1rem;
+}
+
+/* Styles for large screens (992px and up) */
+@media (min-width: 992px) {
+    .admin-container {
+        display: grid;
+        grid-template-columns: 280px 1fr; /* 2-column layout */
+        gap: 1.5rem;
+    }
+
+    /* On desktop, make the offcanvas sidebar behave like a normal sticky element */
+    .admin-sidebar.offcanvas-lg {
+        position: sticky;
+        top: calc(65px + 1.5rem); 
+        height: calc(100vh - 65px - 3rem);
+        background-color: transparent;
+        border: none;
+    }
+}
+
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* This is the new container for your sidebar content */
+.admin-sidebar-body {
+    padding: 1.5rem;
+    height: 100%;
+    /* On desktop, we want the card look */
+    background-color: white;
+    border-radius: 0.75rem;
+}
+
+/* On mobile, the offcanvas provides the background, so we don't need it here */
+@media (max-width: 991.98px) {
+    .admin-sidebar-body {
+        padding: 0;
+        background-color: transparent;
+        border-radius: 0;
+    }
+}
+
+
+/* --- Sidebar Navigation Links --- */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    font-weight: 600;
+    color: #333;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.nav-link .bi {
+    font-size: 1.5rem;
+}
+
+/* --- Main Content --- */
+.list-group-item {
+    border-bottom: 1px solid #f0f2f5 !important;
+}
+.list-group-item:last-child {
+    border-bottom: none !important;
+}

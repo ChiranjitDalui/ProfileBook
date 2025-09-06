@@ -1,58 +1,152 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">Admin • Reports</h3>
-    <div class="d-flex gap-2">
-      <!-- redirect to posts-approve -->
-      <a class="btn btn-outline-secondary" href="/admin/posts">Back to Post Approvals</a>
-      <a class="btn btn-outline-secondary" href="/posts">Back to User Posts</a>
-      <button class="btn btn-outline-danger" (click)="fetchReports()" [disabled]="loading">
-        {{ loading ? 'Refreshing…' : 'Refresh' }}
-      </button>
-    </div>
-  </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - View Reports (Responsive)</title>
 
-  <!-- Filters -->
-  <div class="card p-3 mb-3">
-    <div class="row g-2">
-      <div class="col-md-4">
-        <input [(ngModel)]="q" (input)="applyFilters()" class="form-control" placeholder="Filter by reason…" />
-      </div>
-      <div class="col-md-4">
-        <input [(ngModel)]="user" (input)="applyFilters()" class="form-control" placeholder="Reporting user…" />
-      </div>
-      <div class="col-md-4">
-        <input [(ngModel)]="reported" (input)="applyFilters()" class="form-control" placeholder="Reported user…" />
-      </div>
-    </div>
-    <button class="btn btn-sm btn-link mt-2" (click)="clearFilters()">Clear filters</button>
-  </div>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="reports.css">
 
-  <!-- Table -->
-  <div class="card">
-    <div class="table-responsive">
-      <table class="table table-sm table-striped align-middle mb-0">
-        <thead>
-          <tr>
-            <th style="width:80px;">ID</th>
-            <th>Reason</th>
-            <th style="width:200px;">Reporting User</th>
-            <th style="width:200px;">Reported User</th>
-            <th style="width:220px;">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of filtered">
-            <td>{{ r.id }}</td>
-            <td>{{ r.reason }}</td>
-            <td>{{ r.reportingUser }}</td>
-            <td>{{ r.reportedUser }}</td>
-            <td>{{ r.time ? (r.time | date:'medium') : '' }}</td>
-          </tr>
-          <tr *ngIf="!loading && !filtered.length">
-            <td colspan="5" class="text-center text-muted py-4">No reports found.</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ===================== -->
+    <!--   GLOBAL HEADER       -->
+    <!-- ===================== -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container-fluid">
+                <!-- Hamburger Menu Button (Visible on small screens) -->
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar" aria-controls="adminSidebar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Brand/Logo -->
+                <a class="navbar-brand fw-bolder text-primary mx-lg-0 mx-auto" href="#">
+                    <i class="bi bi-person-badge-fill me-2 fs-4"></i>
+                    ProfileBook
+                </a>
+
+                <!-- Right Aligned Icons -->
+                <div class="d-flex align-items-center">
+                   <button class="btn btn-danger" (click)="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ===================== -->
+    <!--   MAIN ADMIN PAGE     -->
+    <!-- ===================== -->
+    <div class="admin-container">
+
+        <!-- ADMIN SIDEBAR (NOW AN OFFCANVAS COMPONENT) -->
+        <aside id="adminSidebar" class="admin-sidebar offcanvas-lg offcanvas-start" tabindex="-1">
+            
+            <div class="offcanvas-header d-lg-none">
+                <h5 class="offcanvas-title">Admin Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Close"></button>
+            </div>
+            
+            <div class="admin-sidebar-body">
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/admin/posts">
+                        <i class="bi bi-patch-check"></i> Approve Posts
+                    </a>
+                    <a class="nav-link active" href="/admin/reports">
+                        <i class="bi bi-exclamation-octagon-fill"></i> View Reports
+                    </a>
+                    <a class="nav-link" href="/admin/users">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+                    <a class="nav-link" href="/admin/groups">
+                        <i class="bi bi-collection"></i> Manage Groups
+                    </a>
+                    <hr>
+                    <a class="nav-link" href="/posts">
+                        <i class="bi bi-arrow-left-circle"></i> Back to User Feed
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-content">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="m-0 fw-bold">User Reports</h3>
+                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="fetchReports()" [disabled]="loading">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    {{ loading ? 'Refreshing…' : 'Refresh' }}
+                </button>
+            </div>
+
+            <div class="card p-3 mb-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md">
+                        <input [(ngModel)]="q" (input)="applyFilters()" class="form-control" placeholder="Filter by reason…" />
+                    </div>
+                    <div class="col-md">
+                        <input [(ngModel)]="user" (input)="applyFilters()" class="form-control" placeholder="Reporting user ID/Name…" />
+                    </div>
+                    <div class="col-md">
+                        <input [(ngModel)]="reported" (input)="applyFilters()" class="form-control" placeholder="Reported user ID/Name…" />
+                    </div>
+                    <div class="col-md-auto">
+                        <button class="btn btn-link text-decoration-none" (click)="clearFilters()">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:80px;">ID</th>
+                                <th>Reason</th>
+                                <th style="width:200px;">Reporting User</th>
+                                <th style="width:200px;">Reported User</th>
+                                <th style="width:220px;">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let r of filtered">
+                                <td><span class="badge bg-secondary">#{{ r.id }}</span></td>
+                                <td>{{ r.reason }}</td>
+                                <td>{{ r.reportingUser }}</td>
+                                <td>{{ r.reportedUser }}</td>
+                                <td>{{ r.time ? (r.time | date:'medium') : '' }}</td>
+                            </tr>
+                            <tr *ngIf="!loading && !filtered.length">
+                                <td colspan="5" class="text-center text-muted p-5">
+                                    <i class="bi bi-journal-check fs-1"></i>
+                                    <h5 class="mt-2">No Reports Found</h5>
+                                    <p>No reports match your current filters.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
-</div>
+
+    <!-- 
+      This script makes the hamburger menu work. 
+      It's best to place this in your main index.html file so it's loaded once for the whole app.
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

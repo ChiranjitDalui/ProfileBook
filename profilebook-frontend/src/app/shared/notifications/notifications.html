@@ -1,0 +1,45 @@
+<div class="notif-root">
+    <!-- This button now uses Bootstrap classes for the icon and badge positioning -->
+    <button class="notif-bell btn btn-link text-secondary position-relative p-0"
+            (click)="toggle()"
+            aria-label="Notifications">
+      <i class="bi bi-bell fs-5"></i> 
+      <!-- The span now has Bootstrap classes to style it as a positioned badge -->
+      <span *ngIf="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+        {{ unreadCount }}
+      </span>
+    </button>
+  
+    <div class="notif-dropdown card shadow-lg" *ngIf="open">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong class="m-0">Notifications</strong>
+        <small class="text-muted">{{ notifications.length }} total</small>
+      </div>
+  
+      <div class="card-body p-0">
+        <div *ngIf="loading" class="p-3 text-center small text-muted">Loading…</div>
+  
+        <div *ngIf="!loading && notifications.length === 0" class="p-3 text-center text-muted small">
+          No new notifications
+        </div>
+  
+        <ul *ngIf="!loading && notifications.length" class="list-group list-group-flush notif-list">
+          <li *ngFor="let n of notifications" class="list-group-item list-group-item-action d-flex align-items-start">
+            <div class="me-2 flex-grow-1">
+              <div class="notif-message" [class.fw-bold]="!n.isRead">{{ n.message }}</div>
+              <div class="text-muted small mt-1">{{ timeAgo(n.createdAt) }}</div>
+            </div>
+  
+            <div class="ms-auto ps-2" *ngIf="!n.isRead">
+                 <span class="text-primary">•</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+  
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <a href="#" (click)="markAllRead(); $event.preventDefault()" class="btn btn-link btn-sm p-0">Mark all as read</a>
+        <button class="btn btn-sm btn-secondary" (click)="open = false">Close</button>
+      </div>
+    </div>
+  </div>
