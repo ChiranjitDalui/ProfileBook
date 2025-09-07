@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,7 @@
 
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -18,10 +19,10 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="posts.css">
-    <!-- Link to your new notification styles -->
-    <!-- <link rel="stylesheet" href="notifications.css"> -->
-     
+  
+
 </head>
+
 <body>
 
     <!--     HEADER         -->
@@ -30,23 +31,28 @@
             <div class="container-fluid">
                 <!-- Brand/Logo -->
                 <a class="navbar-brand fw-bolder text-primary" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-person-badge-fill me-2" viewBox="0 0 16 16">
-                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm4.5 0a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm5 2.755C12.146 12.825 10.623 12 8 12s-4.146.826-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1.245z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
+                        class="bi bi-person-badge-fill me-2" viewBox="0 0 16 16">
+                        <path
+                            d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm4.5 0a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm5 2.755C12.146 12.825 10.623 12 8 12s-4.146.826-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1.245z" />
                     </svg>
                     ProfileBook
                 </a>
 
                 <!-- Hamburger Menu Button (Mobile) -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                    aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                
+
                 <!-- Collapsible Navbar Content -->
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <!-- Centered Search Bar (Desktop) -->
                     <div class="d-none d-lg-block mx-auto header-search">
                         <div class="input-group">
-                            <input [(ngModel)]="userSearch" (keyup.enter)="searchUsers()" class="form-control" placeholder="Find people..." />
+                            <input [(ngModel)]="userSearch" (keyup.enter)="searchUsers()" class="form-control"
+                                placeholder="Find people..." />
                             <button class="btn btn-outline-secondary" (click)="searchUsers()">
                                 <i class="bi bi-search"></i>
                             </button>
@@ -55,17 +61,18 @@
 
                     <!-- Right Aligned Logout Button (Desktop) -->
                     <ul class="navbar-nav ms-auto d-none d-lg-flex">
-                       <li class="nav-item">
-                           <button class="btn btn-danger" (click)="logout()">Logout</button>
-                       </li>
+                        <li class="nav-item">
+                            <button class="btn btn-danger" (click)="logout()">Logout</button>
+                        </li>
                     </ul>
 
                     <!-- Links for Mobile Menu -->
                     <ul class="navbar-nav d-lg-none mt-3">
                         <!-- Search Bar for Mobile -->
                         <li class="nav-item mb-2">
-                             <div class="input-group">
-                                <input [(ngModel)]="userSearch" (keyup.enter)="searchUsers()" class="form-control" placeholder="Find people..." />
+                            <div class="input-group">
+                                <input [(ngModel)]="userSearch" (keyup.enter)="searchUsers()" class="form-control"
+                                    placeholder="Find people..." />
                                 <button class="btn btn-outline-secondary" (click)="searchUsers()">
                                     <i class="bi bi-search"></i>
                                 </button>
@@ -86,13 +93,17 @@
                                 <i class="bi bi-exclamation-octagon me-2"></i> Admin Reports
                             </a>
                         </li>
-                         <li class="nav-item">
+                        <li class="nav-item">
                             <div class="nav-link">
                                 <!-- The redundant icon is removed; app-notifications now handles its own icon -->
                                 <app-notifications></app-notifications>
                             </div>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-danger" href="#" (click)="logout()">
                                 <i class="bi bi-box-arrow-right me-2"></i> Logout
@@ -112,7 +123,7 @@
                 <a class="nav-link" (click)="openProfileModal()">
                     <i class="bi bi-person-circle"></i> My Profile
                 </a>
-            
+
                 <a class="nav-link" href="/admin/posts">
                     <i class="bi bi-patch-check"></i> Post Approvals
                 </a>
@@ -121,7 +132,7 @@
                 </a>
                 <div class="nav-link">
                     <!-- The redundant icon is removed; app-notifications now handles its own icon -->
-                    <app-notifications></app-notifications>
+                    <app-notifications></app-notifications> Notifications
                 </div>
                 <hr class="my-2">
                 <a class="nav-link text-danger" href="#" (click)="logout()">
@@ -135,7 +146,7 @@
             <!-- Create Post Card -->
             <div class="card p-3 mb-4">
                 <textarea [(ngModel)]="content" class="form-control border-0" style="resize: none;"
-                          placeholder="What's on your mind?"></textarea>
+                    placeholder="What's on your mind?"></textarea>
                 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
                     <input type="file" (change)="onFileSelected($event)" class="form-control" />
                     <button (click)="createPost()" class="btn btn-primary ms-3">Post</button>
@@ -152,11 +163,11 @@
                             <div class="text-muted small">{{ post.createdAt | date:'short' }}</div>
                         </div>
                     </div>
-                    
+
                     <p class="mb-3">{{ post.content }}</p>
 
-                    <img *ngIf="post.postImage" [src]="'http://localhost:5293/' + normalizePath(post.postImage)" 
-                         class="img-fluid mb-2 post-image" />
+                    <img *ngIf="post.postImage" [src]="'http://localhost:5293/' + normalizePath(post.postImage)"
+                        class="img-fluid mb-2 post-image" />
 
                     <div class="d-flex justify-content-between text-muted small mb-2">
                         <span>👍 {{ post.likeCount }} Likes</span>
@@ -170,14 +181,26 @@
                         <button class="btn btn-sm" (click)="post._showComments = !post._showComments">
                             <i class="bi bi-chat-left"></i> Comment
                         </button>
-                         <button class="btn btn-sm btn-outline-danger" (click)="toggleReportOnPost(post)">
-                             {{ post._reportOpen ? 'Cancel' : 'Report' }}
-                         </button>
+                        <button class="btn btn-sm btn-outline-danger" (click)="toggleReportOnPost(post)">
+                            {{ post._reportOpen ? 'Cancel' : 'Report' }}
+                        </button>
+                    <!-- message button -->
+                        <button class="btn btn-sm" (click)="openConversation(post.userName)">
+                            <i class="bi bi-envelope"></i> Message
+                        </button>
+                        <div class="fw-bold">
+  <!-- <a class="text-decoration-none" style="cursor:pointer;" (click)="openConversation(post.userName)">
+    {{ post.userName || 'A User' }}
+
+    
+  </a> -->
+</div>
                     </div>
-                    
+
                     <div *ngIf="post._reportOpen" class="mt-2">
                         <div class="input-group">
-                            <input [(ngModel)]="post._reason" class="form-control" placeholder="Reason (spam, abuse, etc.)" />
+                            <input [(ngModel)]="post._reason" class="form-control"
+                                placeholder="Reason (spam, abuse, etc.)" />
                             <button class="btn btn-danger" (click)="submitReportForPost(post)">Submit</button>
                         </div>
                     </div>
@@ -194,14 +217,15 @@
                         </ng-template>
 
                         <div class="input-group mt-2">
-                            <input [(ngModel)]="post.newComment" placeholder="Add a comment..." class="form-control comment-input" />
+                            <input [(ngModel)]="post.newComment" placeholder="Add a comment..."
+                                class="form-control comment-input" />
                             <button class="btn btn-outline-primary" (click)="commentPost(post)">Post</button>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
-        
+
         <!--    RIGHT SIDEBAR    -->
         <aside class="sidebar-right">
             <div class="card p-3">
@@ -209,15 +233,20 @@
                 <p class="small text-muted">May your day be filled with joy!</p>
             </div>
 
-             <!-- Search results from the header will still appear here -->
+            <!-- Search results from the header will still appear here -->
             <div *ngIf="!isSearching && userResults.length" class="card p-3 mt-3">
-                 <h5 class="mb-3">Search Results</h5>
+                <h5 class="mb-3">Search Results</h5>
                 <div *ngFor="let u of userResults" class="p-2 mb-2 border-bottom">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <div class="fw-semibold">{{ u.username || u.userName || u.name }}</div>
                             <div class="small text-muted">{{ u.email || 'No email' }}</div>
                         </div>
+
+                          <button class="btn btn-sm" (click)="openConversation(u.username || u.userName || u.name)">
+                            <i class="bi bi-envelope"></i> Message
+                        </button>
+
                         <button class="btn btn-sm btn-outline-danger" (click)="toggleReport(u)">
                             {{ u._reportOpen ? 'Cancel' : 'Report' }}
                         </button>
@@ -225,7 +254,9 @@
                     <div *ngIf="u._reportOpen" class="mt-2">
                         <div class="input-group">
                             <input [(ngModel)]="u._reason" class="form-control" placeholder="Reason..." />
-                            <button class="btn btn-danger" [disabled]="reportingBusyId === (u.userId || u.UserId || u.id)" (click)="submitReport(u)">
+                            <button class="btn btn-danger"
+                                [disabled]="reportingBusyId === (u.userId || u.UserId || u.id)"
+                                (click)="submitReport(u)">
                                 Submit
                             </button>
                         </div>
@@ -235,81 +266,85 @@
         </aside>
 
     </div>
-    
-<div class="modal-backdrop fade show" *ngIf="showProfileModal" style="display:block;"></div>
 
-<div class="modal fade show" tabindex="-1" *ngIf="showProfileModal" style="display:block;">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content shadow-lg">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">{{ profile ? 'Edit Profile' : 'Create Your Profile' }}</h5>
-                <button type="button" class="btn-close" aria-label="Close" (click)="closeProfileModal()"></button>
-            </div>
+    <div class="modal-backdrop fade show" *ngIf="showProfileModal" style="display:block;"></div>
 
-            <div class="modal-body p-4">
-                <div class="row">
-                    <!-- Left Column for Avatar -->
-                    <div class="col-md-4 text-center">
-                        <img *ngIf="profile?.profileImage" 
-                             [src]="'http://localhost:5293/' + normalizePath(profile.profileImage)" 
-                             class="profile-avatar mb-3" />
-                        
-                        <div *ngIf="!profile?.profileImage" class="avatar-placeholder mb-3">
-                            <i class="bi bi-person-fill"></i>
-                        </div>
-
-                        <label for="profileImageUpload" class="form-label small text-muted">Update your photo</label>
-                        <div class="input-group">
-                            <input id="profileImageUpload" type="file" class="form-control form-control-sm" (change)="onProfileImageSelected($event)" />
-                        </div>
-                         <div class="form-text mt-2">After selecting a file, save changes.</div>
-                    </div>
-
-                    <!-- Right Column for Form Fields -->
-                    <div class="col-md-8">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label">Full Name*</label>
-                                <input [(ngModel)]="profileForm.fullName" class="form-control" />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email Address</label>
-                                <input [(ngModel)]="profileForm.email" class="form-control" />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone Number</label>
-                                <input [(ngModel)]="profileForm.phone" class="form-control" />
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Bio</label>
-                                <textarea [(ngModel)]="profileForm.bio" rows="3" class="form-control" placeholder="Tell us a little about yourself..."></textarea>
-                            </div>
-                        </div>
-                    </div>
+    <div class="modal fade show" tabindex="-1" *ngIf="showProfileModal" style="display:block;">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">{{ profile ? 'Edit Profile' : 'Create Your Profile' }}</h5>
+                    <button type="button" class="btn-close" aria-label="Close" (click)="closeProfileModal()"></button>
                 </div>
 
-                <div class="mt-3 d-none">
-                    <button class="btn btn-outline-primary" [disabled]="!profileImageFile || uploadingProfileImage" (click)="uploadProfilePic(true)">
-                        {{ uploadingProfileImage ? 'Uploading…' : 'Upload Image' }}
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <!-- Left Column for Avatar -->
+                        <div class="col-md-4 text-center">
+                            <img *ngIf="profile?.profileImage"
+                                [src]="'http://localhost:5293/' + normalizePath(profile.profileImage)"
+                                class="profile-avatar mb-3" />
+
+                            <div *ngIf="!profile?.profileImage" class="avatar-placeholder mb-3">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+
+                            <label for="profileImageUpload" class="form-label small text-muted">Update your
+                                photo</label>
+                            <div class="input-group">
+                                <input id="profileImageUpload" type="file" class="form-control form-control-sm"
+                                    (change)="onProfileImageSelected($event)" />
+                            </div>
+                            <div class="form-text mt-2">After selecting a file, save changes.</div>
+                        </div>
+
+                        <!-- Right Column for Form Fields -->
+                        <div class="col-md-8">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Full Name*</label>
+                                    <input [(ngModel)]="profileForm.fullName" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email Address</label>
+                                    <input [(ngModel)]="profileForm.email" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone Number</label>
+                                    <input [(ngModel)]="profileForm.phone" class="form-control" />
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Bio</label>
+                                    <textarea [(ngModel)]="profileForm.bio" rows="3" class="form-control"
+                                        placeholder="Tell us a little about yourself..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 d-none">
+                        <button class="btn btn-outline-primary" [disabled]="!profileImageFile || uploadingProfileImage"
+                            (click)="uploadProfilePic(true)">
+                            {{ uploadingProfileImage ? 'Uploading…' : 'Upload Image' }}
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" (click)="closeProfileModal()">Close</button>
+                    <button class="btn btn-primary" [disabled]="savingProfile" (click)="saveProfile()">
+                        <span *ngIf="savingProfile" class="spinner-border spinner-border-sm me-1"></span>
+                        {{ savingProfile ? 'Saving…' : (profile ? 'Save Changes' : 'Create Profile') }}
                     </button>
                 </div>
-
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" (click)="closeProfileModal()">Close</button>
-                <button class="btn btn-primary" [disabled]="savingProfile" (click)="saveProfile()">
-                     <span *ngIf="savingProfile" class="spinner-border spinner-border-sm me-1"></span>
-                    {{ savingProfile ? 'Saving…' : (profile ? 'Save Changes' : 'Create Profile') }}
-                </button>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Bootstrap 5 JS Bundle (needed for hamburger menu) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle (needed for hamburger menu) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-</html>
 
+</html>

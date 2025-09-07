@@ -1,0 +1,21 @@
+.messages-container .messages-list {
+  height: 55vh;
+  overflow: auto;
+  background: #fff;
+}
+.message-row {
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    font-weight: 600;
+    color: #05165c;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+}

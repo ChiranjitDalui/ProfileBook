@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api';
 import { NotificationsComponent } from "../../shared/notifications/notifications";
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-posts',
   standalone: true,
@@ -47,12 +49,20 @@ savingProfile = false;
 uploadingProfileImage = false;
 
 
-  constructor(private api: ApiService) {}
+constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadPosts();
     this.loadProfile();
   }
+
+  // Navigate to message conversation by username
+openConversation(username: string) {
+  if (!username) return;
+  // this will route to /messages/:username
+  this.router.navigate(['/messages', username]);
+}
+
 
   logout() {
     localStorage.clear();

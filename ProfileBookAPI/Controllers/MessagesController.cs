@@ -19,38 +19,73 @@ namespace ProfileBookAPI.Controllers
             _context = context;
         }
 
-        // SEND Message
+        // SEND Message by receiver id
         [HttpPost("{receiverId}")]
-        public IActionResult SendMessage(int receiverId, [FromBody] string messageContent)
+        public async Task<IActionResult> SendMessage(int receiverId, [FromBody] MessageDto dto)
         {
-            var senderId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            if (dto is null || string.IsNullOrWhiteSpace(dto.MessageContent))
+                return BadRequest("Message content is required.");
+
+            var senderIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(senderIdClaim, out var senderId))
+                return Unauthorized();
 
             if (senderId == receiverId)
                 return BadRequest("You cannot message yourself.");
 
-            if (!_context.Users.Any(u => u.Id == receiverId))
-                return NotFound("Receiver not found.");
+            var receiverExists = await _context.Users.AnyAsync(u => u.Id == receiverId);
+            if (!receiverExists) return NotFound("Receiver not found.");
 
             var message = new Message
             {
-                MessageContent = messageContent,
+                MessageContent = dto.MessageContent,
                 SenderId = senderId,
-                ReceiverId = receiverId
+                ReceiverId = receiverId,
+                TimeStamp = DateTime.UtcNow
             };
 
             _context.Messages.Add(message);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return Ok("Message sent successfully.");
+            // Return created resource (you can modify to return DTO)
+            return CreatedAtAction(nameof(GetMessageById), new { id = message.Id }, new { message.Id, message.MessageContent, message.TimeStamp });
         }
 
-        // GET Messages between logged-in user and another user
-        [HttpGet("{otherUserId}")]
-        public IActionResult GetMessages(int otherUserId)
+        // Helper to fetch single message (for CreatedAtAction)
+        [HttpGet("message/{id}")]
+        public async Task<IActionResult> GetMessageById(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            var msg = await _context.Messages
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver)
+                .Where(m => m.Id == id)
+                .Select(m => new {
+                    m.Id,
+                    m.MessageContent,
+                    m.TimeStamp,
+                    Sender = m.Sender.Username,
+                    Receiver = m.Receiver.Username
+                })
+                .FirstOrDefaultAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-            var messages = _context.Messages
+            if (msg == null) return NotFound();
+
+            return Ok(msg);
+        }
+
+        // GET Messages between logged-in user and another user (by id)
+        [HttpGet("withUser/{otherUserId}")]
+        public async Task<IActionResult> GetMessages(int otherUserId)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            var messages = await _context.Messages
                 .Where(m =>
                     (m.SenderId == userId && m.ReceiverId == otherUserId) ||
                     (m.SenderId == otherUserId && m.ReceiverId == userId))
@@ -63,49 +98,57 @@ namespace ProfileBookAPI.Controllers
                     m.MessageContent,
                     m.TimeStamp,
                     Sender = m.Sender.Username,
-                    Receiver = m.Receiver.Username
+                    Receiver = m.Receiver.Username,
+                    m.SenderId,
+                    m.ReceiverId
                 })
-                .ToList();
+                .ToListAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             return Ok(messages);
         }
 
-
         // SEND message by username
         [HttpPost("to/{username}")]
-        public IActionResult SendMessageByUsername(string username, [FromBody] string messageContent)
+        public async Task<IActionResult> SendMessageByUsername(string username, [FromBody] MessageDto dto)
         {
-            var senderId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            if (dto is null || string.IsNullOrWhiteSpace(dto.MessageContent))
+                return BadRequest("Message content is required.");
 
-            var receiver = _context.Users.FirstOrDefault(u => u.Username == username);
+            var senderIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(senderIdClaim, out var senderId)) return Unauthorized();
+
+            var receiver = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (receiver == null) return NotFound("Receiver not found.");
 
-            if (receiver.Id == senderId)
-                return BadRequest("You cannot message yourself.");
+            if (receiver.Id == senderId) return BadRequest("You cannot message yourself.");
 
             var message = new Message
             {
-                MessageContent = messageContent,
+                MessageContent = dto.MessageContent,
                 SenderId = senderId,
-                ReceiverId = receiver.Id
+                ReceiverId = receiver.Id,
+                TimeStamp = DateTime.UtcNow
             };
 
             _context.Messages.Add(message);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return Ok("Message sent successfully.");
+            return CreatedAtAction(nameof(GetMessageById), new { id = message.Id }, new { message.Id, message.MessageContent });
         }
 
         // GET conversation by username
-        [HttpGet("with/{username}")]
-        public IActionResult GetMessagesByUsername(string username)
+        [HttpGet("with/username/{username}")]
+        public async Task<IActionResult> GetMessagesByUsername(string username)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
 
-            var otherUser = _context.Users.FirstOrDefault(u => u.Username == username);
+            var otherUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (otherUser == null) return NotFound("User not found.");
 
-            var messages = _context.Messages
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            var messages = await _context.Messages
                 .Where(m =>
                     (m.SenderId == userId && m.ReceiverId == otherUser.Id) ||
                     (m.SenderId == otherUser.Id && m.ReceiverId == userId))
@@ -118,12 +161,14 @@ namespace ProfileBookAPI.Controllers
                     m.MessageContent,
                     m.TimeStamp,
                     Sender = m.Sender.Username,
-                    Receiver = m.Receiver.Username
+                    Receiver = m.Receiver.Username,
+                    m.SenderId,
+                    m.ReceiverId
                 })
-                .ToList();
+                .ToListAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             return Ok(messages);
         }
-
     }
 }

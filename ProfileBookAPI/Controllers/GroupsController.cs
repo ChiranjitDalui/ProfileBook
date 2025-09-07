@@ -74,11 +74,14 @@ namespace ProfileBookAPI.Controllers
         [HttpGet]
         public IActionResult GetGroups()
         {
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
             var groups = _context.Groups
                 .Include(g => g.Members)
                 .ThenInclude(m => m.User)
                 .ToList();
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var result = groups.Select(g => new
             {
                 g.Id,
@@ -89,6 +92,7 @@ namespace ProfileBookAPI.Controllers
                     m.User.Username
                 }).ToList()
             });
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
 
             return Ok(result);

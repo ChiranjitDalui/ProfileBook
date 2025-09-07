@@ -125,3 +125,7 @@ app.MapControllers();
 // Map SignalR hub
 app.MapHub<ChatHub>("/ChatHub");
 app.Run();
+
+// make Program visible to integration tests using WebApplicationFactory<Program>
+public partial class Program { }
+

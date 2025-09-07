@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProfileBook Messages</title>
+
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body, html {
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling on the body */
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .chat-app-container {
+            display: flex;
+            height: 100vh; /* Full viewport height */
+            padding-top: 65px; /* Adjust for your fixed header */
+            box-sizing: border-box;
+        }
+
+        /* --- Conversations Sidebar (Left Panel) --- */
+        .conversations-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+            background-color: #fff;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .conversation-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .conversation-item:hover {
+            background-color: #f8f9fa;
+        }
+        .conversation-item.active {
+            background-color: #e9ecef;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* --- Chat Panel (Right Panel) --- */
+        .chat-panel {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #e9ecef;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+        .chat-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        .chat-footer {
+            padding: 1rem 1.5rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        /* --- Message Bubble Styles --- */
+        .message {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+            max-width: 75%;
+        }
+        .message-content {
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
+            word-wrap: break-word;
+        }
+        .message-sender {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Received (other user) */
+        .received {
+            align-items: flex-start;
+        }
+        .received .message-content {
+            background-color: #fff;
+            color: #212529;
+            border-top-left-radius: 0.25rem;
+        }
+        .received .message-sender {
+            text-align: left;
+            margin-left: 0.5rem;
+        }
+
+        /* Sent (current user) */
+        .sent {
+            align-items: flex-end;
+            align-self: flex-end; /* Align the whole container to the right */
+        }
+        .sent .message-content {
+            background-color: #0d6efd;
+            color: white;
+            border-top-right-radius: 0.25rem;
+        }
+        .sent .message-sender {
+            text-align: right;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+   
+
+    <div class="chat-app-container">
+        
+        <!--   Conversations Sidebar (Left Panel)  -->
+        
+        <aside class="conversations-sidebar">
+            <a class="nav-link" href="/posts"><i class="bi bi-arrow-left-circle"></i> Back to User Feed</a>
+            <div class="sidebar-header">
+
+                <h4 class="m-0 fw-bold">Chats</h4>
+                 
+            </div>
+                          
+              
+          
+            <div class="list-group list-group-flush conversation-list">
+                <!-- Placeholder for a list of conversations -->
+                <div class="list-group-item conversation-item active">
+                    <div class="avatar bg-primary me-3"></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 fw-bold text-dark ">{{ otherUsername || 'A User' }}</h6>
+                            <small class="text-muted">15m</small>
+                        </div>
+                        <p class="mb-1 small text-muted text-truncate">Awesome, thanks! I'll check it out.</p>
+                    </div>
+                </div>
+                 <div class="list-group-item conversation-item">
+                    <div class="avatar bg-success me-3"></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 fw-bold">Admin</h6>
+                            <small class="text-muted">1h</small>
+                        </div>
+                        <p class="mb-1 small text-muted text-truncate">Need help? I'm here.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!--   Active Chat Panel (Right Panel)     -->
+        <main class="chat-panel">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="avatar bg-primary me-3">{{ (otherUsername || 'U').charAt(0) }}</div>
+                <div>
+                    <h5 class="m-0 fw-bold" *ngIf="otherUsername">{{ otherUsername }}</h5>
+                    <h5 class="m-0 fw-bold" *ngIf="otherUserId && !otherUsername">User #{{ otherUserId }}</h5>
+                    <p class="m-0 text-success small">Online</p>
+                </div>
+                 
+            </div>
+
+            <!-- Messages List -->
+            <div class="chat-body">
+                <div *ngFor="let m of messages" class="d-flex" 
+                     [class.justify-content-end]="m.Sender === currentUsername" 
+                     [class.justify-content-start]="m.Sender !== currentUsername">
+                    
+                    <div class="message" [class.sent]="m.Sender === currentUsername" [class.received]="m.Sender !== currentUsername">
+                        <div class="message-sender">{{ m.Sender }} • {{ m.timeStamp | date:'shortTime' }}</div>
+                        <div class="message-content">
+                            {{ m.messageContent }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Placeholder if no conversation is active -->
+                 <div *ngIf="!otherUsername && !otherUserId" class="text-center text-muted h-100 d-flex flex-column justify-content-center">
+                    <i class="bi bi-chat-left-text fs-1"></i>
+                    <h5 class="mt-2">Select a conversation</h5>
+                    <p>Or start a new one from a user's profile.</p>
+                </div>
+            </div>
+
+            <!-- Message Input Footer -->
+            <div class="chat-footer">
+                <div class="input-group">
+                    <input [(ngModel)]="newMessage" class="form-control" placeholder="Type your message here..." (keyup.enter)="sendMessage()" />
+                    <button class="btn btn-primary d-flex align-items-center gap-2" (click)="sendMessage()">
+                        Send <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
